@@ -47,3 +47,45 @@ td.best{background:var(--winner);color:var(--lime);font-weight:700}
 .item small,.sub{color:var(--muted);font-size:12px}
 footer{color:var(--muted);font-size:12px;padding-block:20px 34px}
 @media(max-width:600px){.wrap{padding-inline:14px}.intro{padding-top:32px}th:first-child{width:110px}table{min-width:670px}.toolbar{font-size:12px} footer{align-items:flex-start;flex-direction:column}}
+
+.view-links{display:flex;gap:16px;align-items:center}
+.view-links a{color:var(--muted);text-decoration:none;font-weight:600;white-space:nowrap}
+.view-links a[aria-current=page],.view-links a:hover{color:var(--lime)}
+.loot-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
+.loot-controls label{display:grid;gap:5px;color:var(--muted)}
+.loot-controls label:first-child{flex:1;min-width:min(280px,100%)}
+.loot-controls input{width:100%;min-height:42px}
+#loot-results{display:grid;gap:10px}
+.loot-item{background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.loot-item summary{cursor:pointer;list-style:none;display:grid;grid-template-columns:52px minmax(0,1fr) auto 14px;align-items:center;gap:12px;padding:13px 16px}
+.loot-item summary::-webkit-details-marker{display:none}
+.loot-item summary::after{content:"+";color:var(--lime);font-weight:700}
+.loot-item[open] summary::after{content:"−"}
+.loot-item[open] summary{border-bottom:1px solid var(--line)}
+.loot-icon{width:52px;height:44px;object-fit:contain}
+.loot-title{display:block;font-size:16px;font-weight:700}
+.loot-meta{display:flex;gap:5px 9px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;background:#313729;color:var(--text);font-size:12px}
+.badge.keep{background:#343e25;color:var(--lime)}
+.badge.fir{background:#4b3823;color:#ffe0ae}
+.loot-price{text-align:right;white-space:nowrap}
+.loot-price strong{display:block}
+.loot-details{padding:12px 16px 16px}
+.loot-details a{color:var(--lime)}
+.loot-detail-prices{display:flex;flex-wrap:wrap;gap:8px 22px;margin-bottom:8px;font-size:13px}
+.need{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.need:last-child{border-bottom:0}
+.need p{margin:0}
+.need label{white-space:nowrap;font-size:12px;align-self:center}
+.need.done .need-name{opacity:.65}
+#more{margin-top:14px}
+.loot-note{margin:14px 0 0}
+@media(max-width:620px){
+  .top{flex-wrap:wrap;gap:10px;padding-block:9px}
+  .brand{flex:1 0 100%}
+  .loot-item summary{grid-template-columns:42px minmax(0,1fr) auto 10px;gap:8px;padding-inline:10px}
+  .loot-icon{width:42px}
+  .loot-price strong{font-size:12px}
+  .loot-title{font-size:14px}
+  .need{grid-template-columns:1fr}
+}

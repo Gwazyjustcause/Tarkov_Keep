@@ -9,6 +9,7 @@ const definitions = {
   rig: ["Armored rigs", ["banshee-plate-carrier", "cpc-plate-carrier-goons-edition", "avs-plate-carrier-ranger-green"]],
   armor: ["Body armor", ["6b43-zabralo", "6b45-body-armor", "thor-integrated"]],
   plate: ["Plates", ["granit-4", "granit-br5", "sapi"]],
+  weapon: ["Weapons", ["colt-m4a1-556x45", "ak-74n-545x39", "hk-416a5-556x45"]],
   helmet: ["Helmets", ["6b47-ratnik", "ulach", "fast-mt"]],
   headset: ["Headsets", ["peltor-comtac-vi-headset-coyote", "peltor-comtac-v-headset", "sordin"]],
   backpack: ["Backpacks", ["pilgrim-tourist", "berkut", "tri-zip"]],
@@ -42,6 +43,15 @@ const metrics = {
     ["compressorGain", "Compressor gain", (value) => `${value} dB`],
   ],
   backpack: [...storage, ...mobility],
+  weapon: [
+    ["caliber", "Caliber"], ["preset", "Default preset"],
+    ["ergonomics", "Ergonomics · default preset", plain, "max"],
+    ["recoilVertical", "Vertical recoil · default preset", plain, "min"],
+    ["recoilHorizontal", "Horizontal recoil · default preset", plain, "min"],
+    ["moa", "Accuracy · default preset", (value) => `${number.format(value)} MOA`, "min"],
+    ["fireRate", "Fire rate", (value) => `${number.format(value)} rounds/min`],
+    ["effectiveDistance", "Effective distance", (value) => `${number.format(value)} m`],
+  ],
 };
 const common = [
   ["weight", "Weight", (value) => `${number.format(value)} kg`, "min"],
@@ -93,6 +103,7 @@ function updateUrl(ids) {
   const state = new URLSearchParams({ category: group, mode, items: ids.join(",") });
   if (byId("differences").checked) state.set("diff", "1");
   history.replaceState(null, "", `?${state}`);
+  byId("loot-link").href = `loot.html?mode=${mode}`;
 }
 
 function card(item, column, ids, items) {
@@ -260,9 +271,10 @@ async function load() {
   byId("snapshot").textContent = "";
   try {
     if (!cache.has(current)) {
-      const response = await fetch(`${current}.json`);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      cache.set(current, await response.json());
+      const [gear, weapons] = await Promise.all([
+        readSnapshot(`${current}.json`), readSnapshot(`weapons-${current}.json.gz`),
+      ]);
+      cache.set(current, { date: gear.date, items: [...gear.items, ...weapons.items] });
     }
     if (version !== loadVersion) return;
     data = cache.get(current);
