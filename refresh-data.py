@@ -214,6 +214,44 @@ def loot_snapshot(payload, task_payload, hideout, item_names, task_names, hideou
     return sorted(items, key=lambda item: item[1].casefold())
 
 
+def task_checklist(task_payload, task_names, traders, trader_names):
+    tasks = task_payload["tasks"]
+    entries = {}
+    for key, task in tasks.items():
+        trader = traders.get(task.get("trader")) or {}
+        entries[key] = {
+            "id": key,
+            "name": localized(task, "name", task_names) or task["normalizedName"].replace("-", " ").title(),
+            "trader": localized(trader, "name", trader_names),
+            "level": task.get("minPlayerLevel") or 0,
+            "faction": task.get("factionName"),
+            "url": task.get("wikiLink"),
+            "requirements": [
+                [entry["task"], entry.get("status") or []]
+                for entry in task.get("taskRequirements") or [] if entry["task"] in tasks
+            ],
+        }
+
+    # A listed prerequisite always precedes its dependent task, even when the
+    # dependent task has a lower or unspecified PMC level.
+    remaining = dict(entries)
+    ordered = []
+    effective_level = {}
+    while remaining:
+        candidates = [
+            (max([1, task["level"]] + [effective_level[parent] for parent, _ in task["requirements"]]), key)
+            for key, task in remaining.items()
+            if all(parent in effective_level for parent, _ in task["requirements"])
+        ]
+        if not candidates:
+            raise ValueError("Cycle in Tarkov task prerequisites")
+        minimum = min(level for level, _ in candidates)
+        key = next(key for level, key in candidates if level == minimum)
+        effective_level[key] = minimum
+        ordered.append(remaining.pop(key))
+    return ordered
+
+
 def write_compressed(name, date, items):
     encoded = json.dumps({"date": date, "items": items}, ensure_ascii=False, separators=(",", ":")).encode()
     (OUTPUT / name).write_bytes(gzip.compress(encoded, mtime=0))
@@ -224,6 +262,7 @@ def main(paths):
         "regular/items", "pve/items", "regular/items_en",
         "regular/tasks", "regular/tasks_en", "regular/hideout", "regular/hideout_en",
         "pve/tasks", "pve/tasks_en", "pve/hideout", "pve/hideout_en",
+        "regular/traders", "regular/traders_en", "pve/traders", "pve/traders_en",
     )
     if paths:
         values = [json.loads(Path(path).read_text())["data"] for path in paths]
@@ -243,6 +282,8 @@ def main(paths):
         (OUTPUT / f"{mode}.json").write_text(json.dumps(snapshot, ensure_ascii=False, separators=(",", ":")))
         write_compressed(f"loot-{mode}.json.gz", date, loot)
         write_compressed(f"weapons-{mode}.json.gz", date, weapons)
+        traders, trader_names = requirements[8 + start // 2:10 + start // 2]
+        write_compressed(f"tasks-{mode}.json.gz", date, task_checklist(tasks, task_names, traders, trader_names))
         print(mode, len(items), "comparison items,", len(loot), "loot entries")
 
 

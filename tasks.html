@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Track Escape from Tarkov tasks in unlock order for PvP and PvE.">
+<title>Tarkov Tasks Checklist</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="data.js"></script>
+<script defer src="progress.js"></script>
+<script defer src="tasks.js"></script>
+</head>
+<body>
+<header><div class="wrap top"><span class="brand"><span class="mark" aria-hidden="true">▥</span> Tarkov Gear Compare</span><div class="view-links"><a id="compare-link" href="./">Compare</a><a id="loot-link" href="loot.html">Loot checker</a><a href="tasks.html" aria-current="page">Tasks</a></div><label class="mode">Game mode <select id="mode"><option value="pvp">PvP</option><option value="pve">PvE</option></select></label></div></header>
+<main class="wrap">
+<section class="intro"><h1>Tasks checklist<span>.</span></h1><p>Ordered by listed prerequisites and minimum PMC level. Completed tasks are excluded from Loot Checker recommendations.</p></section>
+<div class="loot-controls">
+<label>Search tasks <input id="task-search" type="search" placeholder="Try Shortage or Gunsmith" autocomplete="off"></label>
+<label>Trader <select id="task-trader"><option value="">All traders</option></select></label>
+<label>Show <select id="task-status"><option value="all">All tasks</option><option value="remaining">Incomplete</option><option value="completed">Completed</option></select></label>
+</div>
+<div class="toolbar"><p id="status" role="status">Loading tasks…</p></div>
+<ol id="task-list" aria-label="Tasks in unlock order"></ol>
+</main>
+<footer class="wrap"><span id="snapshot"></span><a href="https://tarkov.dev/api/">Task data by Tarkov.dev ↗</a></footer>
+</body>
+</html>

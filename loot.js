@@ -11,7 +11,6 @@ const modeSelect = byId("mode");
 const params = new URLSearchParams(location.search);
 const filters = new Set([...filter.options].map((option) => option.value));
 const cache = new Map();
-const progress = new Map();
 const openItems = new Set();
 const pageSize = 24;
 let limit = pageSize;
@@ -35,31 +34,6 @@ function unpack(snapshot) {
     const valuePerSlot = slots ? Math.floor(Math.max(flea, trader) / slots) : 0;
     return {id, name, short, slots, flea, trader, needs, slug, banned, valuePerSlot};
   });
-}
-
-function getProgress() {
-  if (!progress.has(mode)) {
-    let saved = [];
-    try {
-      const value = JSON.parse(localStorage.getItem(`tarkov-keep-progress-${mode}`));
-      if (Array.isArray(value)) saved = value;
-    } catch {
-      // The checker still works without browser storage.
-    }
-    progress.set(mode, new Set(saved));
-  }
-  return progress.get(mode);
-}
-
-function setProgress(group, checked) {
-  const completed = getProgress();
-  if (checked) completed.add(group);
-  else completed.delete(group);
-  try {
-    localStorage.setItem(`tarkov-keep-progress-${mode}`, JSON.stringify([...completed]));
-  } catch {
-    // Preserve progress in memory if storage is unavailable.
-  }
 }
 
 function rank(need) {
@@ -100,12 +74,7 @@ function matchesFilter(status) {
 
 function tradeStats(item) {
   const row = el("div", null, "loot-detail-prices");
-  const flea = item.banned ? "Flea-banned" : rubles(item.flea);
-  row.append(
-    el("span", `Flea (24h avg): ${flea}`),
-    el("span", `Best trader sell: ${rubles(item.trader)}`),
-    el("span", `Stash space: ${item.slots} ${item.slots === 1 ? "slot" : "slots"}`),
-  );
+  row.append(el("span", `Stash space: ${item.slots} ${item.slots === 1 ? "slot" : "slots"}`));
   return row;
 }
 
@@ -149,7 +118,7 @@ function appendNeeds(body, item, completed) {
     checkbox.dataset.group = group;
     checkbox.setAttribute("aria-label", `Mark ${first.name} complete`);
     checkbox.addEventListener("change", () => {
-      setProgress(group, checkbox.checked);
+      setCompletedRequirement(mode, group, checkbox.checked);
       render();
       const updated = document.getElementById(`item-${item.id}`);
       const target = updated?.querySelector(`input[data-group="${CSS.escape(group)}"]`);
@@ -159,6 +128,12 @@ function appendNeeds(body, item, completed) {
     row.append(desc, label);
     body.append(row);
   }
+}
+
+function priceLine(label, value) {
+  const row = el("span", null, "loot-price-line");
+  row.append(el("span", label, "sub"), el("strong", value));
+  return row;
 }
 
 function card(item, status, completed) {
@@ -181,7 +156,11 @@ function card(item, status, completed) {
   if (status.fir) badges.append(el("span", "Found in Raid", "badge fir"));
   heading.append(el("span", item.name, "loot-title"), badges);
   const pricing = el("span", null, "loot-price");
-  if (item.valuePerSlot) pricing.append(el("strong", rubles(item.valuePerSlot)), el("span", "per slot", "sub"));
+  pricing.append(
+    priceLine("Flea", item.banned ? "Banned" : rubles(item.flea)),
+    priceLine("Trader sell", rubles(item.trader)),
+  );
+  if (item.valuePerSlot) pricing.append(el("span", `${rubles(item.valuePerSlot)}/slot`, "sub"));
   summary.append(icon, heading, pricing);
 
   const body = el("div", null, "loot-details");
@@ -198,6 +177,7 @@ function setURL() {
   if (filter.value !== "all") state.set("show", filter.value);
   history.replaceState(null, "", `?${state}`);
   byId("compare-link").href = `./?mode=${mode}`;
+  byId("tasks-link").href = `tasks.html?mode=${mode}`;
 }
 
 function searchScore(item, term) {
@@ -214,7 +194,7 @@ function render() {
   if (!data) return;
   const raw = query.value.trim().toLowerCase();
   const term = Object.hasOwn(aliases, raw) ? aliases[raw] : raw;
-  const completed = getProgress();
+  const completed = completedRequirements(mode);
   const selected = data.items.flatMap((item) => {
     const score = term ? searchScore(item, term) : 1;
     if (!score) return [];
@@ -275,5 +255,11 @@ byId("more").addEventListener("click", () => {
   limit += pageSize;
   render();
   results.children[previous]?.querySelector("summary")?.focus();
+});
+window.addEventListener("storage", (event) => {
+  if (event.key === progressKey(mode) || event.key === null) render();
+});
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) render();
 });
 load();

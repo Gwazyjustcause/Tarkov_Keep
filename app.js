@@ -104,6 +104,7 @@ function updateUrl(ids) {
   if (byId("differences").checked) state.set("diff", "1");
   history.replaceState(null, "", `?${state}`);
   byId("loot-link").href = `loot.html?mode=${mode}`;
+  byId("tasks-link").href = `tasks.html?mode=${mode}`;
 }
 
 function card(item, column, ids, items) {
