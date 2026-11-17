@@ -131,3 +131,15 @@
   .task-artwork { aspect-ratio: 2.45; }
   .task-filters label:first-child { flex-basis: 100%; }
 }
+.story-note { color: var(--muted); max-width: 80ch; margin: 16px 0; }
+.story-section { margin: 18px 0 26px; }
+.story-section h2 { font-size: 28px; margin: 0 0 9px; }
+.story-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; list-style: none; padding: 0; margin: 0; }
+.story-grid .task-card { scroll-margin-top: 16px; }
+.story-grid .task-card:target { border-color: var(--task-accent); }
+.story-items { list-style: none; padding: 0; margin: 10px 0 0; }
+.story-items li { padding: 6px 0; border-top: 1px solid var(--task-edge); }
+.story-items p { margin: 2px 0; }
+.story-items a { color: var(--task-accent); font-weight: 600; }
+@media(max-width: 860px) { .story-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width: 565px) { .story-grid { grid-template-columns: minmax(0,1fr); } }

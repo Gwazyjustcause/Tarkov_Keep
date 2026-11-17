@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Escape from Tarkov story chapters and selected item hand-ins.">
+<title>Tarkov Story Checklist</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="tasks.css?v=3">
+<script defer src="data.js?v=2"></script>
+<script defer src="progress.js"></script>
+<script defer src="story.js"></script>
+</head>
+<body class="tasks-page">
+<header><div class="wrap top"><span class="brand"><span class="mark" aria-hidden="true">▥</span> Tarkov Gear Compare</span><div class="view-links"><a href="./" id="compare-link">Compare</a><a href="loot.html" id="loot-link">Loot checker</a><a href="tasks.html" id="tasks-link">Tasks</a><a href="story.html" aria-current="page">Story</a></div><label class="mode">Game mode <select id="mode"><option value="pvp">PvP</option><option value="pve">PvE</option></select></label></div></header>
+<main class="wrap">
+<section class="task-hero">
+  <div class="task-hero-copy"><h1>Story chapters</h1><p>Follow the main route or explore the other chapters as you find their triggers.</p></div>
+  <div class="task-meter" id="story-meter" hidden><label for="story-progress">Story progress</label><strong id="story-total">0 / 10</strong><progress id="story-progress" value="0" max="10"></progress></div>
+</section>
+<p class="story-note">Selected hand-ins, access items and chapter pickups are listed below. Route choices and patches can change what your active objective asks for. Open the chapter guide for the full walkthrough.</p>
+<p id="status" role="status">Loading Story chapters…</p>
+<section class="story-section" aria-labelledby="main-route"><h2 id="main-route">Main route</h2><ol class="story-grid" id="story-main"></ol></section>
+<section class="story-section" aria-labelledby="side-chapters"><h2 id="side-chapters">Other chapters</h2><ul class="story-grid" id="story-side"></ul></section>
+</main>
+<footer class="wrap"><a href="https://escapefromtarkov.fandom.com/wiki/Story_chapters">Escape from Tarkov Wiki</a><a href="https://tarkov.aquapado.com/guide/en/start/">Tour requirements guide</a><a href="https://raidsignal.com/guides/boreas?mode=pve">Boreas PvE item reference</a><a href="https://tarkovraiders.com/story">Story routes and item guide</a></footer>
+</body>
+</html>

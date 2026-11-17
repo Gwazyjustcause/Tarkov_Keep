@@ -1,0 +1,53 @@
+[
+  {"id":"tour","name":"Tour","main":true,"wiki":"Tour","items":[
+    {"name":"Building materials or tools","count":5,"fir":true,"action":"Hand in to Skier","note":"Any combination that counts for the objective"},
+    {"name":"Weapons","count":2,"fir":true,"action":"Hand in to Mechanic","note":"Any weapons accepted by the objective"},
+    {"name":"PMC dogtags","count":5,"action":"Hand in to Prapor","note":"Reserve unlock"},
+    {"name":"Roubles","count":250000,"action":"Hand in to Therapist","note":"Streets of Tarkov unlock"},
+    {"name":"US dollars","action":"Hand in to Mechanic","note":"Lighthouse unlock. Check the amount on your active objective."}
+  ]},
+  {"id":"falling-skies","name":"Falling Skies","main":true,"wiki":"Falling_Skies","items":[
+    {"name":"Rechargeable battery","slug":"rechargeable-battery","count":3,"fir":true,"action":"Hand in to Prapor"},
+    {"name":"Printed circuit board","slug":"printed-circuit-board","count":5,"fir":true,"action":"Hand in to Prapor"},
+    {"name":"Toolset","slug":"toolset","count":2,"fir":true,"action":"Hand in to Prapor"},
+    {"name":"US dollars","slug":"dollars","count":2000,"action":"Optional payment to Therapist"},
+    {"name":"Flight recorder","action":"Find in the chapter and stash at the objective location"},
+    {"name":"Plane crew transcript and Elektronik’s secure flash drive","action":"Find in the chapter and hand in to Prapor"}
+  ]},
+  {"id":"the-ticket","name":"The Ticket","main":true,"wiki":"The_Ticket","items":[
+    {"name":"Physical Bitcoin","slug":"physical-bitcoin","count":40,"action":"Payment to Mechanic","note":"Route dependent. Applies to the Elektronik’s key objective."},
+    {"name":"TerraGroup Labs keycard (Black)","slug":"terragroup-labs-keycard-black","action":"Use for access and evidence","note":"Route dependent. Check remaining uses before entering."},
+    {"name":"Major TerraGroup evidence","action":"Collect and deliver for the relevant ending","note":"Comes from multiple Story chapters"}
+  ]},
+  {"id":"accidental-witness","name":"Accidental Witness","wiki":"Accidental_Witness","items":[
+    {"name":"Dorm room 110 key","slug":"dorm-room-110-key","count":1,"action":"Use for access"},
+    {"name":"Letter from Kozlov’s room and audio tape with incriminating evidence","action":"Find and read or listen during the chapter"}
+  ]},
+  {"id":"batya","name":"Batya","wiki":"Batya","items":[
+    {"name":"Bogatyrs patch, Moreman’s dogtag, Strelets’ amulet, Taran’s postcard and Voevoda’s recorder","action":"Find during the chapter and hand in to Lightkeeper"}
+  ]},
+  {"id":"blue-fire","name":"Blue Fire","wiki":"Blue_Fire","items":[
+    {"name":"Rus Post car key","slug":"rus-post-car-key","count":1,"action":"Use for access to the blueprint"},
+    {"name":"Device fragment","action":"Find during the chapter and hand in to Mechanic"}
+  ]},
+  {"id":"boreas","name":"Boreas","wiki":"Boreas","items":[
+    {"name":"Toolset","slug":"toolset","count":1,"action":"Bring for the repair objective"},
+    {"name":"Military power filter","slug":"military-power-filter","count":3,"fir":true,"action":"Hand in to Prapor","note":"Only if you kept the armored case in Falling Skies"},
+    {"name":"Ultralink satellite communication module","slug":"ultralink-satellite-communication-module","count":3,"fir":true,"action":"Hand in for decoding"},
+    {"name":"Memento Server RAM Module","slug":"memento-server-ram-module","count":4,"fir":true,"action":"Hand in for decoding"},
+    {"name":"IBX Gigachad cryptographic processor","slug":"ibx-gigachad-cryptographic-processor","count":2,"fir":true,"action":"Hand in for decoding"},
+    {"name":"Sudak-Tudak marine repair kit","slug":"sudak-tudak-marine-repair-kit","count":1,"action":"Use for Icebreaker access"}
+  ]},
+  {"id":"the-labyrinth","name":"The Labyrinth","wiki":"The_Labyrinth_(story_chapter)","items":[
+    {"name":"Labrys access keycard","slug":"labrys-access-keycard","action":"Use for access","note":"Jaeger provides keycards during the chapter"},
+    {"name":"Deceased scientist’s audio tape","action":"Find, listen, then hand in to Jaeger"}
+  ]},
+  {"id":"the-unheard","name":"The Unheard","wiki":"The_Unheard","items":[
+    {"name":"Hard drive printout","action":"Craft at Intelligence Center level 1 and read from the quest inventory"},
+    {"name":"TerraGroup documents and A.P. meeting tapes","action":"Find and read or listen during the chapter"}
+  ]},
+  {"id":"they-are-already-here","name":"They Are Already Here","wiki":"They_Are_Already_Here","items":[
+    {"name":"Flash drive for ARRS station","action":"Find and hand in during the chapter"},
+    {"name":"ARRS system specifications","action":"Read from the handbook once obtained"}
+  ]}
+]

@@ -105,6 +105,7 @@ function updateUrl(ids) {
   history.replaceState(null, "", `?${state}`);
   byId("loot-link").href = `loot.html?mode=${mode}`;
   byId("tasks-link").href = `tasks.html?mode=${mode}`;
+  byId("story-link").href = `story.html?mode=${mode}`;
 }
 
 function card(item, column, ids, items) {

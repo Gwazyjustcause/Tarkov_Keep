@@ -11,6 +11,7 @@ const modeSelect = byId("mode");
 const params = new URLSearchParams(location.search);
 const filters = new Set([...filter.options].map((option) => option.value));
 const cache = new Map();
+let storyCatalogue;
 const openItems = new Set();
 const pageSize = 24;
 let limit = pageSize;
@@ -58,7 +59,7 @@ function statusFor(item, completed) {
   if (relevant.length) return {label: "Optional or alternate task item", alternate: true};
   if (remaining.length) return {label: "Can sell for a task"};
   if (item.needs.length) return {label: "No remaining requirements"};
-  return {label: "No listed task or Hideout use"};
+  return {label: "No listed trader task or Hideout use"};
 }
 
 function matchesFilter(status) {
@@ -67,7 +68,8 @@ function matchesFilter(status) {
     case "fir": return status.fir;
     case "kappa": return status.kappa;
     case "hideout": return status.hideout;
-    case "sell": return !status.keep && !status.alternate;
+    case "story": return status.story.length > 0;
+    case "sell": return !status.keep && !status.alternate && !status.story.length;
     default: return true;
   }
 }
@@ -130,6 +132,24 @@ function appendNeeds(body, item, completed) {
   }
 }
 
+function appendStory(body, matches, completed) {
+  if (!matches.length) return;
+  const section = el("section", null, "loot-story");
+  section.append(el("h3", "Story uses"));
+  for (const {chapter, item} of matches) {
+    const row = el("div", null, "need");
+    const desc = el("div");
+    const link = el("a", chapter.name);
+    link.href = `story.html?mode=${mode}#${chapter.id}`;
+    const notes = [item.action, item.count ? `×${number.format(item.count)}` : "", item.fir ? "Found in Raid" : "", item.note].filter(Boolean);
+    desc.append(link, el("p", notes.join(" · "), "sub"));
+    row.append(desc);
+    if (completed.has(`story:${chapter.id}`)) row.append(el("span", "Chapter completed", "sub"));
+    section.append(row);
+  }
+  body.append(section);
+}
+
 function priceLine(label, value) {
   const row = el("span", null, "loot-price-line");
   row.append(el("span", label, "sub"), el("strong", value));
@@ -154,6 +174,7 @@ function card(item, status, completed) {
   const badges = el("span", null, "loot-meta");
   badges.append(el("span", status.label, status.keep ? "badge keep" : "badge"));
   if (status.fir) badges.append(el("span", "Found in Raid", "badge fir"));
+  if (status.story.length) badges.append(el("span", "Story use", "badge story-badge"));
   heading.append(el("span", item.name, "loot-title"), badges);
   const pricing = el("span", null, "loot-price");
   pricing.append(
@@ -166,6 +187,7 @@ function card(item, status, completed) {
   const body = el("div", null, "loot-details");
   body.append(tradeStats(item));
   appendNeeds(body, item, completed);
+  appendStory(body, data.story.get(item.slug) || [], completed);
   details.append(summary, body);
   return details;
 }
@@ -178,6 +200,7 @@ function setURL() {
   history.replaceState(null, "", `?${state}`);
   byId("compare-link").href = `./?mode=${mode}`;
   byId("tasks-link").href = `tasks.html?mode=${mode}`;
+  byId("story-link").href = `story.html?mode=${mode}`;
 }
 
 function searchScore(item, term) {
@@ -198,7 +221,8 @@ function render() {
   const selected = data.items.flatMap((item) => {
     const score = term ? searchScore(item, term) : 1;
     if (!score) return [];
-    const status = statusFor(item, completed);
+    const story = (data.story.get(item.slug) || []).filter(({chapter}) => !completed.has(`story:${chapter.id}`));
+    const status = {...statusFor(item, completed), story};
     return matchesFilter(status) ? [{item, status, score}] : [];
   });
   selected.sort((a, b) => b.score - a.score ||
@@ -222,8 +246,22 @@ async function load() {
   setURL();
   try {
     if (!cache.has(current)) {
-      const snapshot = await readSnapshot(`loot-${current}.json.gz`);
-      cache.set(current, {date: snapshot.date, items: unpack(snapshot)});
+      const [snapshot, chapters] = await Promise.all([
+        readSnapshot(`loot-${current}.json.gz`),
+        storyCatalogue ??= readSnapshot("story.json").catch((error) => {
+          storyCatalogue = undefined;
+          throw error;
+        }),
+      ]);
+      const story = new Map();
+      for (const chapter of chapters) {
+        for (const item of chapter.items.filter((entry) => entry.slug)) {
+          const matches = story.get(item.slug) || [];
+          matches.push({chapter, item});
+          story.set(item.slug, matches);
+        }
+      }
+      cache.set(current, {date: snapshot.date, items: unpack(snapshot), story});
     }
     if (version !== request) return;
     data = cache.get(current);

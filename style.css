@@ -97,3 +97,6 @@ footer{color:var(--muted);font-size:12px;padding-block:20px 34px}
   .loot-price-line{gap:5px}
   .loot-price-line .sub,.loot-price-line strong{font-size:11px}
 }
+.story-badge { background: #302d46; color: #e5d9ff; }
+.loot-story { margin-top: 14px; border-top: 1px solid var(--line); }
+.loot-story h3 { margin: 9px 0 3px; font-size: 14px; }

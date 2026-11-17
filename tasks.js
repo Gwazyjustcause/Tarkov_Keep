@@ -94,6 +94,10 @@ function taskRow(task, names, completed) {
     content.append(el("p", `Requires ${prerequisites.join(" · ")}`, "task-prereqs sub"));
   }
 
+  if (task.traderRequirements?.length) {
+    content.append(el("p", task.traderRequirements.join(" · "), "task-prereqs sub"));
+  }
+
   const footer = el("div", null, "task-card-footer");
   const label = el("label", null, "task-check");
   label.append(checkbox, el("span", isDone ? "Completed" : "Mark complete"));
@@ -117,6 +121,7 @@ function updateLinks() {
   history.replaceState(null, "", `?${query}`);
   byId("compare-link").href = `./?mode=${mode}`;
   byId("loot-link").href = `loot.html?mode=${mode}`;
+  byId("story-link").href = `story.html?mode=${mode}`;
 }
 
 function render() {
@@ -162,7 +167,7 @@ async function load() {
 
   try {
     if (!cache.has(current)) {
-      const snapshot = await readSnapshot(`tasks-${current}.json.gz`, "2");
+      const snapshot = await readSnapshot(`tasks-${current}.json.gz`, "3");
       cache.set(current, {...snapshot, names: new Map(snapshot.items.map((item) => [item.id, item.name]))});
     }
     if (version !== request) return;

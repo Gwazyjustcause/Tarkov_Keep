@@ -217,8 +217,30 @@ def loot_snapshot(payload, task_payload, hideout, item_names, task_names, hideou
 def task_checklist(task_payload, task_names, traders, trader_names):
     tasks = task_payload["tasks"]
     entries = {}
+    unlock_levels = {}
     for key, task in tasks.items():
         trader = traders.get(task.get("trader")) or {}
+        trader_rules = []
+        levels = [1, task.get("minPlayerLevel") or 0]
+        for rule in task.get("traderRequirements") or []:
+            target = traders.get(rule.get("trader")) or {}
+            name = localized(target, "name", trader_names) or "Trader"
+            value = rule["value"]
+            operator = rule["compareMethod"]
+            if rule["requirementType"] == "level":
+                level = next((entry for entry in target.get("levels") or [] if entry["level"] == value), {})
+                if operator == ">=":
+                    levels.append(level.get("requiredPlayerLevel") or 0)
+                trader_rules.append(f"{name} LL{value:g}" if operator == ">=" else f"{name} LL {operator} {value:g}")
+            elif rule["requirementType"] == "reputation":
+                trader_rules.append(f"{name} reputation {operator} {value:g}")
+        for rule in task.get("otherRequirements") or []:
+            if rule.get("type") == "dialogue":
+                for trader_id in rule.get("traders") or []:
+                    name = localized(traders.get(trader_id) or {}, "name", trader_names)
+                    if name:
+                        trader_rules.append(f"Talk to {name}")
+        unlock_levels[key] = max(levels)
         entries[key] = {
             "id": key,
             "name": localized(task, "name", task_names) or task["normalizedName"].replace("-", " ").title(),
@@ -228,6 +250,7 @@ def task_checklist(task_payload, task_names, traders, trader_names):
             "level": task.get("minPlayerLevel") or 0,
             "faction": task.get("factionName"),
             "url": task.get("wikiLink"),
+            "traderRequirements": trader_rules,
             "requirements": [
                 [entry["task"], entry.get("status") or []]
                 for entry in task.get("taskRequirements") or [] if entry["task"] in tasks
@@ -241,7 +264,7 @@ def task_checklist(task_payload, task_names, traders, trader_names):
     effective_level = {}
     while remaining:
         candidates = [
-            (max([1, task["level"]] + [effective_level[parent] for parent, _ in task["requirements"]]), key)
+            (max([unlock_levels[key]] + [effective_level[parent] for parent, _ in task["requirements"]]), key)
             for key, task in remaining.items()
             if all(parent in effective_level for parent, _ in task["requirements"])
         ]
