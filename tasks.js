@@ -8,6 +8,8 @@ const statusSelect = byId("task-status");
 const list = byId("task-list");
 const status = byId("status");
 const more = byId("task-more");
+const clearTask = byId("task-clear");
+const number = new Intl.NumberFormat("en");
 const pageSize = 18;
 const params = new URLSearchParams(location.search);
 const cache = new Map();
@@ -15,6 +17,7 @@ let mode = params.get("mode") === "pve" ? "pve" : "pvp";
 let tasks = null;
 let request = 0;
 let limit = pageSize;
+let focusedTask = params.get("task") || "";
 
 modeSelect.value = mode;
 search.value = params.get("q") || "";
@@ -55,6 +58,88 @@ function taskArtwork(task, isDone) {
   }
   if (isDone) artwork.append(el("span", "Completed", "task-completed"));
   return artwork;
+}
+
+function appendObjectives(content, objectives) {
+  if (!objectives?.length) return;
+  const section = el("section", null, "task-detail");
+  section.append(el("h4", "Objectives"));
+  const rows = objectives.map((objective) => {
+    const row = el("li", null);
+    const quantity = objective.count ? `×${number.format(objective.count)} · ` : "";
+    row.append(el("span", `${quantity}${objective.text}`));
+    if (objective.optional) row.append(el("span", "Optional", "task-note"));
+    if (objective.specs?.length) row.append(el("small", objective.specs.join(" · "), "sub task-specs"));
+    return row;
+  });
+  const list = el("ul", null, "task-detail-list");
+  list.append(...rows.slice(0, 3));
+  section.append(list);
+  if (rows.length > 3) {
+    const details = el("details", null, "task-expand");
+    const rest = el("ul", null, "task-detail-list");
+    rest.append(...rows.slice(3));
+    details.append(el("summary", `Show ${rows.length - 3} more objectives`), rest);
+    section.append(details);
+  }
+  content.append(section);
+}
+
+function itemLink([id, name]) {
+  const link = el("a", name, "task-item-link");
+  link.href = `loot.html?${new URLSearchParams({mode, q: id})}`;
+  return link;
+}
+
+function requirementRow(requirement) {
+  const {action, count, fir, optional, alternative, items} = requirement;
+  const row = el("li", null, "task-item-row");
+  const summary = el("div", null, "task-item-label");
+  const quantity = count != null ? ` ×${number.format(count)}${alternative ? " total" : ""}` : "";
+  summary.append(el("span", `${action}${quantity}`));
+  if (fir) summary.append(el("span", "Found in Raid", "badge fir"));
+  if (optional) summary.append(el("span", "Optional", "task-note"));
+  row.append(summary);
+  if (items.length === 1) {
+    const item = tasks.catalogue[items[0]];
+    if (item) row.append(itemLink(item));
+    return row;
+  }
+  const options = el("details", null, "task-expand");
+  const label = alternative ? `See ${items.length} eligible options` : `See ${items.length} listed items`;
+  options.append(el("summary", label));
+  options.addEventListener("toggle", () => {
+    if (!options.open) return;
+    const list = el("ul", null, "task-detail-list");
+    for (const ref of items) {
+      const item = tasks.catalogue[ref];
+      if (item) {
+        const option = el("li");
+        option.append(itemLink(item));
+        list.append(option);
+      }
+    }
+    options.append(list);
+  }, {once: true});
+  row.append(options);
+  return row;
+}
+
+function appendItems(content, requirements) {
+  if (!requirements?.length) return;
+  const section = el("section", null, "task-detail");
+  section.append(el("h4", "Items needed"));
+  const list = el("ul", null, "task-detail-list");
+  list.append(...requirements.slice(0, 3).map(requirementRow));
+  section.append(list);
+  if (requirements.length > 3) {
+    const details = el("details", null, "task-expand");
+    const rest = el("ul", null, "task-detail-list");
+    rest.append(...requirements.slice(3).map(requirementRow));
+    details.append(el("summary", `Show ${requirements.length - 3} more item requirements`), rest);
+    section.append(details);
+  }
+  content.append(section);
 }
 
 function taskRow(task, names, completed) {
@@ -98,6 +183,9 @@ function taskRow(task, names, completed) {
     content.append(el("p", task.traderRequirements.join(" · "), "task-prereqs sub"));
   }
 
+  appendObjectives(content, task.objectives);
+  appendItems(content, task.itemRequirements);
+
   const footer = el("div", null, "task-card-footer");
   const label = el("label", null, "task-check");
   label.append(checkbox, el("span", isDone ? "Completed" : "Mark complete"));
@@ -118,6 +206,8 @@ function updateLinks() {
   const query = new URLSearchParams({mode});
   const term = search.value.trim();
   if (term) query.set("q", term);
+  if (focusedTask) query.set("task", focusedTask);
+  clearTask.hidden = !focusedTask;
   history.replaceState(null, "", `?${query}`);
   byId("compare-link").href = `./?mode=${mode}`;
   byId("loot-link").href = `loot.html?mode=${mode}`;
@@ -131,6 +221,7 @@ function render() {
   const done = tasks.items.filter((task) => completed.has(task.id)).length;
   const term = search.value.trim().toLowerCase();
   const selected = tasks.items.filter((task) => {
+    if (focusedTask) return focusedTask === task.id;
     if (traderSelect.value && traderSelect.value !== task.trader) return false;
     if (statusSelect.value === "remaining" && completed.has(task.id)) return false;
     if (statusSelect.value === "completed" && !completed.has(task.id)) return false;
@@ -143,7 +234,7 @@ function render() {
   meter.max = tasks.items.length;
   meter.value = done;
   byId("task-meter").hidden = false;
-  status.textContent = selected.length ? `Showing ${shown.length} of ${selected.length} tasks` : "No matching tasks";
+  status.textContent = selected.length ? `Showing ${shown.length} of ${selected.length} tasks` : focusedTask ? "This task is unavailable in the selected mode." : "No matching tasks";
   more.hidden = shown.length === selected.length;
 }
 
@@ -167,7 +258,7 @@ async function load() {
 
   try {
     if (!cache.has(current)) {
-      const snapshot = await readSnapshot(`tasks-${current}.json.gz`, "3");
+      const snapshot = await readSnapshot(`tasks-${current}.json.gz`, "4");
       cache.set(current, {...snapshot, names: new Map(snapshot.items.map((item) => [item.id, item.name]))});
     }
     if (version !== request) return;
@@ -184,10 +275,16 @@ async function load() {
 }
 
 function filterTasks() {
+  focusedTask = "";
   limit = pageSize;
   render();
 }
 
+clearTask.addEventListener("click", () => {
+  search.value = "";
+  filterTasks();
+  search.focus();
+});
 search.addEventListener("input", filterTasks);
 traderSelect.addEventListener("change", filterTasks);
 statusSelect.addEventListener("change", filterTasks);

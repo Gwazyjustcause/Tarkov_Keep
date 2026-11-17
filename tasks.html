@@ -6,10 +6,10 @@
 <meta name="description" content="Track Escape from Tarkov tasks in unlock order for PvP and PvE.">
 <title>Tarkov Tasks Checklist</title>
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="tasks.css?v=3">
+<link rel="stylesheet" href="tasks.css?v=4">
 <script defer src="data.js?v=2"></script>
 <script defer src="progress.js"></script>
-<script defer src="tasks.js?v=3"></script>
+<script defer src="tasks.js?v=4"></script>
 </head>
 <body class="tasks-page">
 <header><div class="wrap top"><span class="brand"><span class="mark" aria-hidden="true">▥</span> Tarkov Gear Compare</span><div class="view-links"><a id="compare-link" href="./">Compare</a><a id="loot-link" href="loot.html">Loot checker</a><a href="tasks.html" aria-current="page">Tasks</a><a id="story-link" href="story.html?mode=pve">Story</a></div><label class="mode">Game mode <select id="mode"><option value="pvp">PvP</option><option value="pve">PvE</option></select></label></div></header>
@@ -31,7 +31,7 @@
     <label>Trader <select id="task-trader"><option value="">All traders</option></select></label>
     <label>Show <select id="task-status"><option value="all">All tasks</option><option value="remaining">Incomplete</option><option value="completed">Completed</option></select></label>
   </div>
-  <div class="task-results"><h2>Trader task progression</h2><p id="status" role="status">Loading tasks…</p></div>
+  <div class="task-results"><h2>Trader task progression</h2><div class="task-result-actions"><button type="button" id="task-clear" hidden>All trader tasks</button><p id="status" role="status">Loading tasks…</p></div></div>
   <ol id="task-list" aria-label="Tasks in unlock order"></ol>
   <button id="task-more" class="task-more" type="button" hidden>Show more tasks</button>
 </section>

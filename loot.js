@@ -98,12 +98,8 @@ function appendNeeds(body, item, completed) {
     const checked = completed.has(group);
     const row = el("div", null, checked ? "need done" : "need");
     const desc = el("div", null, "need-name");
-    const title = first.url ? el("a", first.name) : el("strong", first.name);
-    if (first.url) {
-      title.href = first.url;
-      title.target = "_blank";
-      title.rel = "noopener noreferrer";
-    }
+    const title = first.kind === "task" ? el("a", first.name) : el("strong", first.name);
+    if (first.kind === "task") title.href = `tasks.html?${new URLSearchParams({mode, task: group})}`;
     desc.append(title);
     for (const need of needs) {
       const tokens = [need.action];
@@ -204,6 +200,7 @@ function setURL() {
 }
 
 function searchScore(item, term) {
+  if (term === item.id) return 4;
   const name = item.name.toLowerCase();
   const short = item.short.toLowerCase();
   if (term === name || term === short) return 3;

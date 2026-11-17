@@ -112,7 +112,7 @@ def item_ids(values):
             yield value
 
 
-def collect_requirements(tasks, hideout, names):
+def collect_requirements(tasks, hideout, names, on_item_group=None):
     requirements = {}
     labels = {
         "giveItem": "Hand in", "findItem": "Find", "plantItem": "Plant",
@@ -131,18 +131,23 @@ def collect_requirements(tasks, hideout, names):
 
         def add(ids, action, objective=None, alternative=False, count=None):
             objective = objective or {}
-            for item in dict.fromkeys(item_ids(ids)):
-                if item:
-                    entry = {**common, "action": action}
-                    if count is not None:
-                        entry["count"] = count
-                    if objective.get("foundInRaid"):
-                        entry["fir"] = True
-                    if objective.get("optional"):
-                        entry["optional"] = True
-                    if alternative:
-                        entry["alternative"] = True
-                    requirements.setdefault(item, []).append(entry)
+            items = list(dict.fromkeys(item for item in item_ids(ids) if item))
+            if not items:
+                return
+            entry = {**common, "action": action}
+            if count is not None:
+                entry["count"] = count
+            if objective.get("foundInRaid"):
+                entry["fir"] = True
+            if objective.get("optional"):
+                entry["optional"] = True
+            if alternative:
+                entry["alternative"] = True
+            if on_item_group is not None:
+                on_item_group(entry, items)
+                return
+            for item in items:
+                requirements.setdefault(item, []).append(entry)
 
         objectives = task.get("objectives") or []
         give_items = {
@@ -214,8 +219,39 @@ def loot_snapshot(payload, task_payload, hideout, item_names, task_names, hideou
     return sorted(items, key=lambda item: item[1].casefold())
 
 
-def task_checklist(task_payload, task_names, traders, trader_names):
+def objective_summary(objective, task_names):
+    summary = {
+        "text": localized(objective, "description", task_names) or objective["type"],
+        "optional": bool(objective.get("optional")),
+    }
+    if objective.get("count", 0) and objective["count"] > 1:
+        summary["count"] = objective["count"]
+    specs = [
+        f"{re.sub(r'(?<!^)(?=[A-Z])', ' ', label).capitalize()} {rule['compareMethod']} {rule['value']:g}"
+        for label, rule in (objective.get("buildAttributes") or {}).items() if rule.get("value")
+    ]
+    if specs:
+        summary["specs"] = specs
+    return summary
+
+
+def task_checklist(task_payload, task_names, traders, trader_names, item_names):
     tasks = task_payload["tasks"]
+    names = item_names | task_names
+    quest_items = task_payload["questItems"]
+    groups = {}
+
+    def collect_item_group(entry, ids):
+        items = [
+            [item, localized(quest_items.get(item, {}), "name", names) or names.get(f"{item} Name")]
+            for item in ids
+        ]
+        items = [item for item in items if item[1]]
+        if items:
+            keys = ("action", "count", "fir", "optional", "alternative")
+            groups.setdefault(entry["group"], []).append({**{key: entry[key] for key in keys if key in entry}, "items": items})
+
+    collect_requirements(tasks, {}, names, collect_item_group)
     entries = {}
     unlock_levels = {}
     for key, task in tasks.items():
@@ -251,6 +287,8 @@ def task_checklist(task_payload, task_names, traders, trader_names):
             "faction": task.get("factionName"),
             "url": task.get("wikiLink"),
             "traderRequirements": trader_rules,
+            "objectives": [objective_summary(objective, task_names) for objective in task.get("objectives") or []],
+            "itemRequirements": groups.get(key, []),
             "requirements": [
                 [entry["task"], entry.get("status") or []]
                 for entry in task.get("taskRequirements") or [] if entry["task"] in tasks
@@ -277,9 +315,24 @@ def task_checklist(task_payload, task_names, traders, trader_names):
     return ordered
 
 
-def write_compressed(name, date, items):
-    encoded = json.dumps({"date": date, "items": items}, ensure_ascii=False, separators=(",", ":")).encode()
+def write_compressed(name, date, items, **metadata):
+    encoded = json.dumps({"date": date, "items": items, **metadata}, ensure_ascii=False, separators=(",", ":")).encode()
     (OUTPUT / name).write_bytes(gzip.compress(encoded, mtime=0))
+
+
+def write_task_snapshot(mode, date, tasks):
+    item_index = {}
+    catalogue = []
+    for task in tasks:
+        for requirement in task["itemRequirements"]:
+            refs = []
+            for item_id, name in requirement["items"]:
+                if item_id not in item_index:
+                    item_index[item_id] = len(catalogue)
+                    catalogue.append([item_id, name])
+                refs.append(item_index[item_id])
+            requirement["items"] = refs
+    write_compressed(f"tasks-{mode}.json.gz", date, tasks, catalogue=catalogue)
 
 
 def main(paths):
@@ -308,7 +361,7 @@ def main(paths):
         write_compressed(f"loot-{mode}.json.gz", date, loot)
         write_compressed(f"weapons-{mode}.json.gz", date, weapons)
         traders, trader_names = requirements[8 + start // 2:10 + start // 2]
-        write_compressed(f"tasks-{mode}.json.gz", date, task_checklist(tasks, task_names, traders, trader_names))
+        write_task_snapshot(mode, date, task_checklist(tasks, task_names, traders, trader_names, names))
         print(mode, len(items), "comparison items,", len(loot), "loot entries")
 
 
