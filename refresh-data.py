@@ -223,6 +223,8 @@ def task_checklist(task_payload, task_names, traders, trader_names):
             "id": key,
             "name": localized(task, "name", task_names) or task["normalizedName"].replace("-", " ").title(),
             "trader": localized(trader, "name", trader_names),
+            "image": task.get("taskImageLink"),
+            "portrait": trader.get("imageLink"),
             "level": task.get("minPlayerLevel") or 0,
             "faction": task.get("factionName"),
             "url": task.get("wikiLink"),

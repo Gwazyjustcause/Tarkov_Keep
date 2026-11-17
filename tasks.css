@@ -1,0 +1,133 @@
+.tasks-page {
+  --task-card: #1e201a;
+  --task-edge: #3c4132;
+  --task-accent: #dce6ac;
+  background: #141612;
+}
+.tasks-page .wrap { max-width: 1300px; }
+.tasks-page .view-links a[aria-current="page"] {
+  text-decoration: underline;
+  text-underline-offset: 7px;
+  text-decoration-thickness: 2px;
+}
+.task-hero {
+  position: relative;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 212px;
+  overflow: hidden;
+  margin-top: 26px;
+  padding: 30px 33px;
+  border: 1px solid var(--task-edge);
+  border-radius: 12px;
+  background: linear-gradient(90deg, #21251bd9 25%, #242a1acc 58%, #141811aa),
+    url("https://assets.tarkov.dev/5bc4776586f774512d07cf05.webp") 82% 52% / cover;
+}
+.task-hero h1 { font-size: clamp(45px, 7vw, 81px); line-height: .88; }
+.task-hero p { max-width: 44ch; margin: 13px 0 0; color: #d5d7c8; }
+.task-meter {
+  flex: 0 0 min(252px, 33%);
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  background: #171a13e8;
+  border: 1px solid #556043;
+  border-radius: 8px;
+}
+.task-meter[hidden] { display: none; }
+.task-meter label { color: var(--muted); font-size: 12px; font-weight: 600; }
+.task-meter strong { color: var(--task-accent); font-family: "Barlow Condensed", sans-serif; font-size: 30px; line-height: 1.06; }
+.task-meter progress { display: block; width: 100%; height: 6px; margin-top: 5px; accent-color: var(--task-accent); }
+.task-board { margin-top: 16px; }
+.task-filters {
+  padding: 12px 14px;
+  border: 1px solid var(--task-edge);
+  border-radius: 8px;
+  background: #1a1d16;
+}
+.task-filters select { min-height: 42px; }
+.task-results { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin: 17px 0 10px; }
+.task-results h2 { font-size: 25px; }
+.task-results p { margin: 0; color: var(--muted); font-size: 12px; }
+#task-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.task-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--task-edge);
+  border-radius: 9px;
+  background: var(--task-card);
+  overflow: hidden;
+}
+.task-card:focus-within { border-color: #858c62; }
+.task-card.done { border-color: #69774c; }
+.task-artwork {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 2.2;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 68% 23%, #41493a, #292e23 65%, #20251c);
+}
+.task-artwork::after {
+  position: absolute;
+  content: "";
+  inset: 0;
+  background: linear-gradient(transparent 49%, #151711b9);
+  pointer-events: none;
+}
+.task-scene { width: 100%; height: 100%; position: absolute; inset: 0; object-fit: cover; }
+.task-artwork .task-portrait { width: 76px; height: 76px; border-color: #5a614d; }
+.task-completed {
+  position: absolute;
+  right: 9px;
+  top: 9px;
+  z-index: 1;
+  padding: 3px 7px;
+  color: var(--task-accent);
+  background: #252d1aee;
+  border: 1px solid #64734a;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.task-card-body { padding: 11px 13px 12px; flex: 1; }
+.task-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; min-height: 24px; }
+.task-portrait { width: 23px; height: 23px; object-fit: cover; border: 1px solid #565c49; border-radius: 50%; }
+.task-meta .sub { font-size: 11px; }
+.task-name { font-size: 25px; line-height: 1.02; color: #f3f0e8; margin-top: 6px; }
+.task-prereqs { margin: 7px 0 0; }
+.task-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 13px;
+  min-height: 43px;
+  gap: 7px;
+  border-top: 1px solid #34392d;
+}
+.task-check { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: var(--text); }
+.task-check input { margin: 0; width: 16px; height: 16px; }
+.task-card.done .task-check { color: var(--task-accent); }
+.task-wiki { color: var(--task-accent); font-size: 12px; text-decoration: none; white-space: nowrap; }
+.task-wiki:hover { text-decoration: underline; }
+.task-more { margin: 15px auto 0; display: block; min-width: 160px; }
+.task-more[hidden] { display: none; }
+@media (max-width: 860px) {
+  #task-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 565px) {
+  .task-hero { align-items: start; flex-direction: column; padding: 21px 16px; margin-top: 15px; gap: 12px; }
+  .task-meter { width: 100%; }
+  #task-list { grid-template-columns: minmax(0, 1fr); }
+  .task-artwork { aspect-ratio: 2.45; }
+  .task-filters label:first-child { flex-basis: 100%; }
+}

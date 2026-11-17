@@ -92,13 +92,6 @@ footer{color:var(--muted);font-size:12px;padding-block:20px 34px}
 .loot-price{display:grid;gap:2px}
 .loot-price-line{display:flex;justify-content:space-between;gap:12px}
 .loot-price-line strong{font-size:13px}
-#task-list{padding:0;margin:0;list-style:none;display:grid;gap:6px}
-.task-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:11px 14px}
-.task-row > input{margin:4px 0 0;width:17px;height:17px}
-.task-name{font-weight:700;cursor:pointer}
-.task-row.done .task-name{color:var(--muted);text-decoration:line-through}
-.task-row p{margin:2px 0 0}
-.task-wiki{font-size:12px;color:var(--lime);white-space:nowrap}
 @media(max-width:620px){
   .view-links{gap:11px;flex-wrap:wrap}
   .loot-price-line{gap:5px}

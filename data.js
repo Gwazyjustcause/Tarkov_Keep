@@ -1,7 +1,8 @@
 "use strict";
 
-async function readSnapshot(path) {
-  const response = await fetch(path);
+async function readSnapshot(path, version) {
+  const url = version ? `${path}?v=${encodeURIComponent(version)}` : path;
+  const response = await fetch(url);
   if (!response.ok) throw new Error(`Could not load ${path}: HTTP ${response.status}`);
   if (!path.endsWith(".gz")) return response.json();
 

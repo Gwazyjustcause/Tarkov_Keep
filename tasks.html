@@ -6,22 +6,36 @@
 <meta name="description" content="Track Escape from Tarkov tasks in unlock order for PvP and PvE.">
 <title>Tarkov Tasks Checklist</title>
 <link rel="stylesheet" href="style.css">
-<script defer src="data.js"></script>
+<link rel="stylesheet" href="tasks.css?v=2">
+<script defer src="data.js?v=2"></script>
 <script defer src="progress.js"></script>
-<script defer src="tasks.js"></script>
+<script defer src="tasks.js?v=2"></script>
 </head>
-<body>
+<body class="tasks-page">
 <header><div class="wrap top"><span class="brand"><span class="mark" aria-hidden="true">▥</span> Tarkov Gear Compare</span><div class="view-links"><a id="compare-link" href="./">Compare</a><a id="loot-link" href="loot.html">Loot checker</a><a href="tasks.html" aria-current="page">Tasks</a></div><label class="mode">Game mode <select id="mode"><option value="pvp">PvP</option><option value="pve">PvE</option></select></label></div></header>
 <main class="wrap">
-<section class="intro"><h1>Tasks checklist<span>.</span></h1><p>Ordered by listed prerequisites and minimum PMC level. Completed tasks are excluded from Loot Checker recommendations.</p></section>
-<div class="loot-controls">
-<label>Search tasks <input id="task-search" type="search" placeholder="Try Shortage or Gunsmith" autocomplete="off"></label>
-<label>Trader <select id="task-trader"><option value="">All traders</option></select></label>
-<label>Show <select id="task-status"><option value="all">All tasks</option><option value="remaining">Incomplete</option><option value="completed">Completed</option></select></label>
-</div>
-<div class="toolbar"><p id="status" role="status">Loading tasks…</p></div>
-<ol id="task-list" aria-label="Tasks in unlock order"></ol>
+<section class="task-hero" aria-labelledby="task-heading">
+  <div class="task-hero-copy">
+    <h1 id="task-heading">Tasks checklist</h1>
+    <p>Track your trader tasks in unlock order. Completed tasks are taken off your Loot Checker recommendations.</p>
+  </div>
+  <div class="task-meter" id="task-meter" hidden>
+    <label for="task-progress">Task progress</label>
+    <strong id="task-total">0 / 0</strong>
+    <progress id="task-progress" value="0" max="1"></progress>
+  </div>
+</section>
+<section class="task-board" aria-label="Task browser">
+  <div class="loot-controls task-filters">
+    <label>Search tasks <input id="task-search" type="search" placeholder="Shortage, Gunsmith, Delivery From the Past…" autocomplete="off"></label>
+    <label>Trader <select id="task-trader"><option value="">All traders</option></select></label>
+    <label>Show <select id="task-status"><option value="all">All tasks</option><option value="remaining">Incomplete</option><option value="completed">Completed</option></select></label>
+  </div>
+  <div class="task-results"><h2>Unlock order</h2><p id="status" role="status">Loading tasks…</p></div>
+  <ol id="task-list" aria-label="Tasks in unlock order"></ol>
+  <button id="task-more" class="task-more" type="button" hidden>Show more tasks</button>
+</section>
 </main>
-<footer class="wrap"><span id="snapshot"></span><a href="https://tarkov.dev/api/">Task data by Tarkov.dev ↗</a></footer>
+<footer class="wrap"><span id="snapshot"></span><a href="https://tarkov.dev/api/">Task data and images by Tarkov.dev ↗</a></footer>
 </body>
 </html>
