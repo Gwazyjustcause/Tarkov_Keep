@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Compare Escape from Tarkov rigs, armor, helmets, headsets and backpacks side by side.">
+<title>Tarkov Gear Compare</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="app.js"></script>
+</head>
+<body>
+<header><div class="wrap top"><span class="brand"><span class="mark" aria-hidden="true">▥</span> Tarkov Gear Compare</span><label class="mode">Game mode <select id="mode"><option value="pvp">PvP</option><option value="pve">PvE</option></select></label></div></header>
+<main class="wrap">
+<section class="intro"><h1>Compare your kit<span>.</span></h1><p>Pick up to three items and see how they stack up.</p></section>
+<section aria-label="Gear comparison">
+<nav id="categories" aria-label="Gear category"></nav>
+<div class="toolbar"><p id="status" role="status">Loading gear…</p><label><input type="checkbox" id="differences"> Differences only</label></div>
+<div class="comparison" id="comparison" hidden tabindex="0" aria-label="Scrollable gear comparison">
+<table><thead id="cards"></thead><tbody id="stats"></tbody></table>
+</div>
+</section>
+</main>
+<footer class="wrap"><span id="snapshot"></span><a href="https://tarkov.dev/api/">Data and item images by Tarkov.dev ↗</a></footer>
+</body>
+</html>
